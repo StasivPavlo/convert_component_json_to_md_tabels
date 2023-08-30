@@ -37,7 +37,7 @@ const getDefaultValue = (property) => {
   }
 }
 
-const getProperty = (property) => {
+const getPropertyRow = (property) => {
   return [
     `${property.label}: \`${property.name}\``,
     getPropertyTypeHandler(property),
@@ -49,8 +49,36 @@ const getProperty = (property) => {
   ]
 };
 
-const columns = ['Property', 'Type', 'Default Value', 'Logic', 'Data Binding', 'UI Setting', 'Description'];
+const getEventHandlerRow = (eventHandler) => {
+  return [
+    eventHandler.label,
+    eventHandler.handlerDescription,
+    eventHandler.contextBlocks ? eventHandler.contextBlocks.map(block => `${block.label}: \`\``).join(', ') : '',
+  ]
+};
 
-const rows = component.properties.map(property => getProperty(property));
+const getActionRow = (action) => {
+    return [
+      action.label,
+      action.inputs ? action.inputs.map(input => `${input.label}: \`\``).join(', ') : '',
+      action.returns ? action.returns.map(returnValue => `${returnValue.label}: \`\``).join(', ') : '',
+    ]
+};
 
-fs.writeFileSync('table.md', markdownTable([columns, ...rows]));
+const propertyColumns = ['Property', 'Type', 'Default Value', 'Logic', 'Data Binding', 'UI Setting', 'Description'];
+
+const propertyRows = component.properties.map(property => getPropertyRow(property));
+
+fs.writeFileSync('table.md', markdownTable([propertyColumns, ...propertyRows]));
+
+const eventColumns = ['Name', 'Triggers', 'Context Blocks'];
+
+const eventRows = component.eventHandlers.map(eventHandler => getEventHandlerRow(eventHandler));
+
+fs.appendFileSync('table.md', '\n\n' + markdownTable([eventColumns, ...eventRows]));
+
+const actionColumns = ['Action', 'Inputs', 'Returns'];
+
+const actionRows = component.actions.map(action => getActionRow(action));
+
+fs.appendFileSync('table.md', '\n\n' + markdownTable([actionColumns, ...actionRows]));
